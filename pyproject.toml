@@ -2,7 +2,7 @@
 name = "audio-test-fixtures"
 version = "0.1.0"
 description = "Deterministic audio fixtures and validation tools for automated audio pipeline testing"
-authors = ["Your Name <you@example.com>"]
+authors = ["Jesús Leganés-Combarro 'piranna' (https://piranna.github.io)"]
 license = "MIT"
 readme = "README.md"
 packages = [{ include = "audio_test_fixtures", from = "src" }]

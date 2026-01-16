@@ -1,6 +1,7 @@
 # Audio Test Fixtures
 
-Utilities for generating and validating deterministic audio fixtures for automated testing of audio pipelines.
+Utilities for generating and validating deterministic audio fixtures for
+automated testing of audio pipelines.
 
 This project provides:
 
