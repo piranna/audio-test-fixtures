@@ -8,8 +8,8 @@ readme = "README.md"
 packages = [{ include = "audio_test_fixtures", from = "src" }]
 
 [tool.poetry.dependencies]
-python = ">=3.8"
-numpy = "^1.24"
+python = ">=3.11"
+numpy = "^2.4.1"
 
 [tool.poetry.scripts]
 generate-vocal-scale = "audio_test_fixtures.generate_vocal_scale:main"
