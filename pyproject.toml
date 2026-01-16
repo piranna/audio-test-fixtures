@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "audio-test-fixtures"
+version = "0.1.0"
+description = "Deterministic audio fixtures and validation tools for automated audio pipeline testing"
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{ include = "audio_test_fixtures", from = "src" }]
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+numpy = "^1.24"
+
+[tool.poetry.scripts]
+generate-vocal-scale = "audio_test_fixtures.generate_vocal_scale:main"
+validate-audio = "audio_test_fixtures.validate_audio_transmission:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
