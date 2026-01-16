@@ -12,6 +12,9 @@ This project provides:
 It is designed for **end-to-end audio testing**, codec validation, transmission
 integrity checks, and CI automation.
 
+Blog post:
+<https://piranna.github.io/2026/01/16/Deterministic-Audio-Fixtures-for-End-to-End-Testing/>
+
 ## Features
 
 ### Audio Generator
