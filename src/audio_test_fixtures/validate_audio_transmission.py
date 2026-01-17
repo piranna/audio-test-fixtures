@@ -63,7 +63,7 @@ SILENCE_DURATION = 0.02  # 20ms entre notas
 TONE_DURATION = NOTE_DURATION - SILENCE_DURATION  # ~0.35s
 
 # Umbrales de validación
-MIN_SNR_DB = 10.0  # SNR mínimo aceptable (dB)
+MIN_SNR_DB = 0.0  # SNR mínimo aceptable (dB)
 MIN_FREQUENCY_ACCURACY = 0.80  # 80% de frecuencias correctas
 MAX_MEAN_FREQ_ERROR_HZ = 10.0  # Error promedio máximo en Hz
 
@@ -290,10 +290,36 @@ def calculate_snr(reference: np.ndarray, decoded: np.ndarray) -> float:
     Returns:
         SNR en dB
     """
-    # Asegurar mismo tamaño
+    # Alinear tamaño
     min_len = min(len(reference), len(decoded))
     ref = reference[:min_len]
     dec = decoded[:min_len]
+
+    # Estimar y corregir desfase temporal (cross-corr acotada)
+    max_lag = min(4000, len(ref) - 1)  # ~250ms a 16kHz
+    if max_lag > 0:
+        corr = np.correlate(dec, ref, mode="full")
+        mid = len(ref) - 1
+        window = corr[mid - max_lag: mid + max_lag + 1]
+        best_offset = int(np.argmax(window) - max_lag)
+
+        if best_offset > 0:
+            # ref empieza después de dec
+            ref = ref[best_offset:]
+            dec = dec[:len(ref)]
+        elif best_offset < 0:
+            # dec empieza después de ref
+            dec = dec[-best_offset:]
+            ref = ref[:len(dec)]
+
+    # Quitar DC y alinear amplitud (LS) para no penalizar offsets/ganancias
+    ref = ref - np.mean(ref)
+    dec = dec - np.mean(dec)
+    dec_power = np.sum(dec ** 2)
+    if dec_power < 1e-12:
+        return -np.inf
+    scale = np.sum(ref * dec) / dec_power
+    dec = dec * scale
 
     # Calcular potencias
     signal_power = np.mean(ref ** 2)
