@@ -63,7 +63,11 @@ PRESET_RANGES = {
 }
 
 
-def select_notes(range_name: str, min_freq: float, max_freq: float):
+def select_notes(
+    range_name: str,
+    min_freq: float | None = None,
+    max_freq: float | None = None
+):
     """
     Selecciona subconjunto de notas según preset o límites en Hz.
     """
@@ -109,14 +113,14 @@ def add_fade(audio, fade_samples):
     return audio
 
 
-def write_wav(output_file, audio_float, channels, bit_depth, sample_rate):
+def write_wav(output_file, audio_float, channels, bit_depth, sample_rate, normalize_factor=1.0):
     """
     Escribe audio float [-1,1] a WAV con configuración dada.
     """
-    # Normalizar a evitar clipping (90% del rango)
+    # Normalizar al factor especificado del rango digital
     peak = np.max(np.abs(audio_float))
     if peak > 0:
-        audio_float = audio_float / peak * 0.9
+        audio_float = audio_float / peak * normalize_factor
 
     # Convertir a PCM
     if bit_depth == 16:
@@ -183,11 +187,12 @@ def generate_vocal_scale_wav(output_file,
                              channels=1,
                              bit_depth=16,
                              range_name='full',
-                             min_freq=None,
-                             max_freq=None,
+                             min_freq: float | None = None,
+                             max_freq: float | None = None,
                              silence_duration=0.02,
                              tone_amplitude=0.3,
-                             fade_ms=5.0):
+                             fade_ms=5.0,
+                             normalize_factor=1.0):
     """
     Genera archivo WAV con escala vocal ascendente.
     """
@@ -237,7 +242,8 @@ def generate_vocal_scale_wav(output_file,
         current_sample += int((tone_duration + silence_duration) * sample_rate)
 
     # Escribir archivo WAV con la configuración
-    write_wav(output_file, audio, channels, bit_depth, sample_rate)
+    write_wav(output_file, audio, channels, bit_depth,
+              sample_rate, normalize_factor)
 
     print()
     print(f"✓ Archivo generado: {output_file}")
@@ -296,6 +302,8 @@ Ejemplos:
                    help='Amplitud del tono [0-1] (default: 0.3)')
     p.add_argument('--fade-ms', type=float, default=5.0,
                    help='Fade-in/out en ms (default: 5.0)')
+    p.add_argument('--normalize', type=float, default=1.0,
+                   help='Factor de normalización [0-1] donde 1.0=0dB, 0.9=−0.9dB, etc. (default: 1.0)')
     return p
 
 
@@ -315,6 +323,7 @@ def main():
         silence_duration=args.silence,
         tone_amplitude=args.amplitude,
         fade_ms=args.fade_ms,
+        normalize_factor=args.normalize,
     )
 
     print("\nNotas para análisis automatizado:")
